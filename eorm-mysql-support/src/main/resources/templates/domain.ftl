@@ -10,7 +10,7 @@ import com.denghb.eorm.annotation.Etable;
  <pre>
 ${tableDdl}
  <pre>
- * @author DbHelper
+ * @author denghb
  * @generateTime ${generateTime}
  */
 @Etable(name="${tableName}",database="${databaseName}")
