@@ -15,7 +15,7 @@ public class DatabaseModel {
      */
     private String tableComment;
 
-    private boolean checked = true;
+    private boolean checked = false;// 默认不选中
 
     public String getTableName() {
 

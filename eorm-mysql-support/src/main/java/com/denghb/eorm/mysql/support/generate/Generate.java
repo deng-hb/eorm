@@ -25,8 +25,12 @@ public class Generate {
             throw new GenerateException("Connection is null");
         }
 
+        String tableName = model.getTableName();
+        if (tableName.startsWith("tb_")) {
+            tableName = tableName.substring(3);
+        }
         // 类名
-        String domainName = ColumnUtils.removeAll_AndNextCharToUpperCase(model.getTableName());
+        String domainName = ColumnUtils.removeAll_AndNextCharToUpperCase(tableName);
         domainName = ColumnUtils.firstCharToUpperCase(domainName);
         // 查询对应数据库对应表的字段信息
 

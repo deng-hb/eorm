@@ -53,7 +53,7 @@ public class ColumnUtils {
         dataType = dataType.toLowerCase().trim();
         if ("varchar".equals(dataType) || "text".equals(dataType) || "string".equals(dataType) || "char".equals(dataType) || "longtext".equals(dataType) || "mediumtext".equals(dataType)) {
             dataType = "String";
-        } else if ("int".equals(dataType) || "integer".equals(dataType) || "smallint".equals(dataType)) {
+        } else if ("int".equals(dataType) || "integer".equals(dataType) || "smallint".equals(dataType) || "tinyint".equals(dataType)) {
             dataType = "Integer";
         } else if ("bigint".equals(dataType) || "long".equals(dataType)) {
             dataType = "Long";
