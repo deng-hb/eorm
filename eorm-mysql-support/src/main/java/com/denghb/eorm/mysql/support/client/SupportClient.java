@@ -8,6 +8,7 @@ import com.denghb.eorm.mysql.support.generate.Generate;
 import com.denghb.eorm.mysql.support.generate.GenerateException;
 import com.denghb.eorm.mysql.support.generate.model.ConnectionModel;
 import com.denghb.eorm.mysql.support.generate.model.DatabaseModel;
+import com.denghb.eorm.mysql.support.generate.model.GenerateModel;
 import com.denghb.eorm.mysql.support.generate.utils.DbUtils;
 
 import javax.swing.*;
@@ -28,7 +29,6 @@ public class SupportClient extends JFrame {
     DatabaseTableModel model = new DatabaseTableModel(data);
     TableView table = new TableView(model);
 
-    ConnectionModel connectionModel;
     JPanel loadPanel;
 
     public SupportClient() {
@@ -67,7 +67,6 @@ public class SupportClient extends JFrame {
         controlPanel.setConnectionHandler(new ControlPanel.ControlConnectionHandler() {
             @Override
             public boolean execute(ConnectionModel model) {
-                connectionModel = model;
 
                 try {
                     DbUtils.init(model);
@@ -106,7 +105,7 @@ public class SupportClient extends JFrame {
         });
         controlPanel.setExecuteHandler(new ControlPanel.ControlExecuteHandler() {
             @Override
-            public void execute(final String packageName, final String targetDir) {
+            public void execute(final GenerateModel generateModel) {
 
                 if (data.isEmpty()) {
                     System.out.println("data is null");
@@ -123,7 +122,7 @@ public class SupportClient extends JFrame {
 
                             try {
                                 if (model.isChecked()) {
-                                    Generate.create(DbUtils.getConnection(), connectionModel.getDatabase(), packageName, model, targetDir);
+                                    Generate.create(DbUtils.getConnection(), model, generateModel);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();

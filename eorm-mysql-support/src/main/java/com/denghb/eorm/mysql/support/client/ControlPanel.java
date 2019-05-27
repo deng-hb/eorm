@@ -2,6 +2,7 @@ package com.denghb.eorm.mysql.support.client;
 
 
 import com.denghb.eorm.mysql.support.generate.model.ConnectionModel;
+import com.denghb.eorm.mysql.support.generate.model.GenerateModel;
 import com.denghb.eorm.mysql.support.utils.ConfigUtils;
 
 import javax.swing.*;
@@ -18,7 +19,18 @@ import java.io.File;
  * host      username   password
  * database  port       connection
  */
-public class ControlPanel extends Panel {
+public class ControlPanel extends Panel implements ActionListener {
+
+    private TextField _hostField;
+    private TextField _portField;
+    private TextField _databaseField;
+
+    private TextField _usernameField;
+    private JPasswordField _passwordField;
+    private TextField _packageField;
+
+    private JCheckBox _enableSwagger2;
+    private JCheckBox _enableLombok;
 
     public interface ControlConnectionHandler {
         boolean execute(ConnectionModel model);
@@ -29,7 +41,7 @@ public class ControlPanel extends Panel {
     }
 
     public interface ControlExecuteHandler {
-        void execute(String packageName, String targetDir);
+        void execute(GenerateModel model);
     }
 
     private static int _X = 30;
@@ -53,133 +65,75 @@ public class ControlPanel extends Panel {
         hostLabel.setBounds(_X, getBottom(label), _WIDTH, _HEIGHT - 8);
         this.add(hostLabel);
 
-        final TextField hostField = new TextField();
-        hostField.setBounds(_X, getBottom(hostLabel), _WIDTH, _HEIGHT);
-        this.add(hostField);
+        _hostField = new TextField();
+        _hostField.setBounds(_X, getBottom(hostLabel), _WIDTH, _HEIGHT);
+        this.add(_hostField);
 
         // 用户名
         Label usernameLabel = new Label("Username:");
         usernameLabel.setBounds(getRight(hostLabel) + _X, getBottom(label), _WIDTH, _HEIGHT - 8);
         this.add(usernameLabel);
 
-        final TextField usernameField = new TextField();
-        usernameField.setBounds(usernameLabel.getX(), getBottom(usernameLabel), _WIDTH, _HEIGHT);
-        this.add(usernameField);
+        _usernameField = new TextField();
+        _usernameField.setBounds(usernameLabel.getX(), getBottom(usernameLabel), _WIDTH, _HEIGHT);
+        this.add(_usernameField);
 
         // 密码
         Label passwordLabel = new Label("Password:");
         passwordLabel.setBounds(getRight(usernameLabel) + _X, getBottom(label), _WIDTH, _HEIGHT - 8);
         this.add(passwordLabel);
 
-        final JPasswordField passwordField = new JPasswordField();
+        _passwordField = new JPasswordField();
         Border line = BorderFactory.createLineBorder(Color.DARK_GRAY);
         Border empty = new EmptyBorder(0, 5, 0, 0);
         CompoundBorder border = new CompoundBorder(line, empty);
-        passwordField.setBorder(border);
-        passwordField.setBounds(passwordLabel.getX(), getBottom(passwordLabel), _WIDTH, _HEIGHT);
-        this.add(passwordField);
+        _passwordField.setBorder(border);
+        _passwordField.setBounds(passwordLabel.getX(), getBottom(passwordLabel), _WIDTH, _HEIGHT);
+        this.add(_passwordField);
 
         // 数据库
         Label databaseLabel = new Label("Database:");
-        databaseLabel.setBounds(_X, getBottom(hostField), _WIDTH, _HEIGHT - 8);
+        databaseLabel.setBounds(_X, getBottom(_hostField), _WIDTH, _HEIGHT - 8);
         this.add(databaseLabel);
 
-        final TextField databaseField = new TextField();
-        databaseField.setBounds(_X, getBottom(databaseLabel), _WIDTH, _HEIGHT);
-        this.add(databaseField);
+        _databaseField = new TextField();
+        _databaseField.setBounds(_X, getBottom(databaseLabel), _WIDTH, _HEIGHT);
+        this.add(_databaseField);
 
         // 端口
         Label portLabel = new Label("Port:");
-        portLabel.setBounds(getRight(databaseLabel) + _X, getBottom(hostField), _WIDTH, _HEIGHT - 8);
+        portLabel.setBounds(getRight(databaseLabel) + _X, getBottom(_hostField), _WIDTH, _HEIGHT - 8);
         this.add(portLabel);
 
-        final TextField portField = new TextField();
-        portField.setBounds(portLabel.getX(), getBottom(portLabel), _WIDTH, _HEIGHT);
-        this.add(portField);
+        _portField = new TextField();
+        _portField.setBounds(portLabel.getX(), getBottom(portLabel), _WIDTH, _HEIGHT);
+        this.add(_portField);
 
         TextField connField = new TextField();
         connField.setEnabled(false);
-        connField.setBounds(getRight(portField) + _X, portField.getY(), _WIDTH, _HEIGHT);
+        connField.setBounds(getRight(_portField) + _X, _portField.getY(), _WIDTH, _HEIGHT);
         this.add(connField);
 
         JButton connButton = new JButton("Connection");
         connButton.setBorderPainted(false);
         connButton.setBounds(0, 0, _WIDTH, _HEIGHT);
         connButton.setBackground(Color.lightGray);
-        connButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
-                hostField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-
-                // host
-                String host = hostField.getText();
-                if (isEmpty(host)) {
-                    showError(hostField);
-                    return;
-                }
-                // username
-                String username = usernameField.getText();
-                if (isEmpty(username)) {
-                    showError(usernameField);
-                    return;
-                }
-
-                // password
-                String password = passwordField.getText();
-
-                // database
-                String database = databaseField.getText();
-                if (isEmpty(database)) {
-                    showError(databaseField);
-                    return;
-                }
-
-                // port
-                String port = portField.getText();
-                if (isEmpty(port)) {
-                    port = "3306";
-                    portField.setText(port);
-                }
-
-
-                if (null != connectionHandler) {
-                    ConnectionModel model = new ConnectionModel();
-                    model.setDatabase(database);
-                    model.setHost(host);
-                    model.setPassword(password);
-                    model.setPort(port);
-                    model.setUsername(username);
-
-                    connectionHandler.execute(model);
-                }
-
-
-                // 保存配置
-                ConfigUtils.setValue("host", host);
-                ConfigUtils.setValue("username", username);
-                ConfigUtils.setValue("password", password);
-
-                ConfigUtils.setValue("database", database);
-                ConfigUtils.setValue("port", port);
-            }
-        });
+        connButton.addActionListener(this);
         connField.add(connButton);
 
 
         // package
         Label packageLabel = new Label("Package:");
-        packageLabel.setBounds(_X, getBottom(databaseField), _WIDTH, _HEIGHT - 8);
+        packageLabel.setBounds(_X, getBottom(_databaseField), _WIDTH, _HEIGHT - 8);
         this.add(packageLabel);
 
-        final TextField packageField = new TextField();
-        packageField.setBounds(_X, getBottom(packageLabel), _WIDTH, _HEIGHT);
-        this.add(packageField);
+        _packageField = new TextField();
+        _packageField.setBounds(_X, getBottom(packageLabel), _WIDTH, _HEIGHT);
+        this.add(_packageField);
 
         // targetDir
         final Label targetDirLabel = new Label("Target Directory:");
-        targetDirLabel.setBounds(getRight(packageLabel) + _X, getBottom(databaseField), _WIDTH, _HEIGHT - 8);
+        targetDirLabel.setBounds(getRight(packageLabel) + _X, getBottom(_databaseField), _WIDTH, _HEIGHT - 8);
         this.add(targetDirLabel);
 
         final JTextField targetField = new JTextField();
@@ -222,8 +176,8 @@ public class ControlPanel extends Panel {
         // _______________________________________
 
         // Search
-        Label searchLabel = new Label("Search:");
-        searchLabel.setBounds(_X, getBottom(packageField) + 20, _WIDTH, _HEIGHT - 8);
+        Label searchLabel = new Label("Search Table:");
+        searchLabel.setBounds(_X, getBottom(_packageField) + 10, _WIDTH, _HEIGHT - 8);
         this.add(searchLabel);
         final TextField searchField = new TextField();
 //        searchField.setPlaceholder(" Keyword");
@@ -269,9 +223,9 @@ public class ControlPanel extends Panel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String packageName = packageField.getText();
+                String packageName = _packageField.getText();
                 if (isEmpty(packageName)) {
-                    showError(packageField);
+                    showError(_packageField);
                     return;
                 }
 
@@ -280,27 +234,112 @@ public class ControlPanel extends Panel {
                     showError2(targetField);
                     return;
                 }
-
                 ConfigUtils.setValue("packageName", packageName);
                 ConfigUtils.setValue("targetDir", targetDir);
 
+                boolean swagger2 = _enableSwagger2.isSelected();
+                ConfigUtils.setValue("enableSwagger2", swagger2 ? "true" : "false");
+                boolean lombok = _enableLombok.isSelected();
+                ConfigUtils.setValue("enableLombok", lombok ? "true" : "false");
+
+
                 if (null != executeHandler) {
-                    executeHandler.execute(packageName, targetDir);
+                    GenerateModel generateModel = new GenerateModel();
+                    generateModel.setDatabase(_databaseField.getText());
+                    generateModel.setLombok(lombok);
+                    generateModel.setSwagger2(swagger2);
+                    generateModel.setTargetDir(targetDir);
+                    generateModel.setPackageName(packageName);
+                    executeHandler.execute(generateModel);
                 }
 
             }
         });
+
+        // 选项
+        _enableSwagger2 = new JCheckBox("Enable Swagger2");
+        _enableSwagger2.setBounds(_X, getBottom(searchField) + 10, 150, _HEIGHT - 10);
+        this.add(_enableSwagger2);
+
+        _enableLombok = new JCheckBox("Enable Lombok");
+        _enableLombok.setBounds(getRight(_enableSwagger2) + _X, getBottom(searchField) + 10, 150, _HEIGHT - 10);
+        this.add(_enableLombok);
+
         // 初始化数据
-        hostField.setText(ConfigUtils.getValue("host"));
-        usernameField.setText(ConfigUtils.getValue("username"));
-        passwordField.setText(ConfigUtils.getValue("password"));
+        _hostField.setText(ConfigUtils.getValue("host"));
+        _usernameField.setText(ConfigUtils.getValue("username"));
+        _passwordField.setText(ConfigUtils.getValue("password"));
 
-        databaseField.setText(ConfigUtils.getValue("database"));
-        portField.setText(ConfigUtils.getValue("port"));
+        _databaseField.setText(ConfigUtils.getValue("database"));
+        _portField.setText(ConfigUtils.getValue("port"));
 
-        packageField.setText(ConfigUtils.getValue("packageName"));
+        _packageField.setText(ConfigUtils.getValue("packageName"));
         targetField.setText(ConfigUtils.getValue("targetDir"));
 
+        _enableSwagger2.setSelected("true".equals(ConfigUtils.getValue("enableSwagger2")));
+        _enableLombok.setSelected("true".equals(ConfigUtils.getValue("enableLombok")));
+
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        doConnected();
+    }
+
+    private void doConnected() {
+        _hostField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        // host
+        String host = _hostField.getText();
+        if (isEmpty(host)) {
+            showError(_hostField);
+            return;
+        }
+        // username
+        String username = _usernameField.getText();
+        if (isEmpty(username)) {
+            showError(_usernameField);
+            return;
+        }
+
+        // password
+        String password = _passwordField.getText();
+
+        // database
+        String database = _databaseField.getText();
+        if (isEmpty(database)) {
+            showError(_databaseField);
+            return;
+        }
+
+        // port
+        String port = _portField.getText();
+        if (isEmpty(port)) {
+            port = "3306";
+            _portField.setText(port);
+        }
+
+
+        if (null != connectionHandler) {
+            ConnectionModel model = new ConnectionModel();
+            model.setDatabase(database);
+            model.setHost(host);
+            model.setPassword(password);
+            model.setPort(port);
+            model.setUsername(username);
+
+            connectionHandler.execute(model);
+        }
+
+
+        // 保存配置
+        ConfigUtils.setValue("host", host);
+        ConfigUtils.setValue("username", username);
+        ConfigUtils.setValue("password", password);
+
+        ConfigUtils.setValue("database", database);
+        ConfigUtils.setValue("port", port);
     }
 
     private void showError(JComponent component) {

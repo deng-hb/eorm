@@ -3,6 +3,7 @@ package com.denghb.eorm.mysql.support.generate;
 import com.denghb.eorm.Eorm;
 import com.denghb.eorm.impl.EormImpl;
 import com.denghb.eorm.mysql.support.generate.model.DatabaseModel;
+import com.denghb.eorm.mysql.support.generate.model.GenerateModel;
 import com.denghb.eorm.mysql.support.generate.model.TableModel;
 import com.denghb.eorm.mysql.support.generate.utils.ColumnUtils;
 import freemarker.template.Configuration;
@@ -20,10 +21,13 @@ import java.util.Map;
  */
 public class Generate {
 
-    public static void create(Connection conn, String database, String packageName, DatabaseModel model, String targetDir) throws GenerateException {
+    public static void create(Connection conn, DatabaseModel model, GenerateModel gen) throws GenerateException {
         if (null == conn) {
             throw new GenerateException("Connection is null");
         }
+        String database = gen.getDatabase();
+        String packageName = gen.getPackageName();
+        String targetDir = gen.getTargetDir();
 
         String tableName = model.getTableName();
         if (tableName.startsWith("tb_")) {
@@ -57,13 +61,14 @@ public class Generate {
             root.put("domainName", domainName);
 
             root.put("tableName", model.getTableName());
-
             root.put("databaseName", database);
             root.put("tableDdl", ddl);
 
             root.put("generateTime", new Date().toString());
             root.put("packageName", packageName);
+            root.put("lombok", gen.getLombok());
 
+            root.put("swagger2", gen.getSwagger2());
             // TODO 路径
             File file = new File(targetDir + "/" + domainName + ".java");
 
