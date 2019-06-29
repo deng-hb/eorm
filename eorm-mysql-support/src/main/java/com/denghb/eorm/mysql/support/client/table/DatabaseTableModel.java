@@ -7,7 +7,7 @@ import java.util.Vector;
 
 public class DatabaseTableModel extends AbstractTableModel {
 
-    String[] n = {"Table", "Comment", "Check"};
+    String[] n = {"Table", "Comment", "Select"};
 
     private Vector<DatabaseModel> data;
 

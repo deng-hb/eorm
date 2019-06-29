@@ -16,6 +16,8 @@ public class GenerateModel {
 
     private Boolean lombok;
 
+    private Boolean override;
+
     public String getDatabase() {
         return database;
     }
@@ -54,5 +56,13 @@ public class GenerateModel {
 
     public void setLombok(Boolean lombok) {
         this.lombok = lombok;
+    }
+
+    public Boolean getOverride() {
+        return override;
+    }
+
+    public void setOverride(Boolean override) {
+        this.override = override;
     }
 }

@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,6 +31,8 @@ public class ControlPanel extends Panel implements ActionListener {
     private JPasswordField _passwordField;
     private TextField _packageField;
 
+    private JCheckBox _selectAll;
+    private JCheckBox _override;
     private JCheckBox _enableSwagger2;
     private JCheckBox _enableLombok;
 
@@ -44,6 +48,10 @@ public class ControlPanel extends Panel implements ActionListener {
         void execute(GenerateModel model);
     }
 
+    public interface SelectAllHandler {
+        void execute(boolean select);
+    }
+
     private static int _X = 30;
     private static int _WIDTH = 230;
     private static int _HEIGHT = 28;
@@ -51,6 +59,8 @@ public class ControlPanel extends Panel implements ActionListener {
     private ControlConnectionHandler connectionHandler;
     private ControlSearchHandler searchHandler;
     private ControlExecuteHandler executeHandler;
+
+    private SelectAllHandler selectAllHandler;
 
     public ControlPanel() {
 
@@ -114,7 +124,7 @@ public class ControlPanel extends Panel implements ActionListener {
         connField.setBounds(getRight(_portField) + _X, _portField.getY(), _WIDTH, _HEIGHT);
         this.add(connField);
 
-        JButton connButton = new JButton("Connection");
+        JButton connButton = new JButton("1. Pull tables");
         connButton.setBorderPainted(false);
         connButton.setBounds(0, 0, _WIDTH, _HEIGHT);
         connButton.setBackground(Color.lightGray);
@@ -237,6 +247,10 @@ public class ControlPanel extends Panel implements ActionListener {
                 ConfigUtils.setValue("packageName", packageName);
                 ConfigUtils.setValue("targetDir", targetDir);
 
+                boolean selectAll = _selectAll.isSelected();
+                ConfigUtils.setValue("selectAll", selectAll ? "true" : "false");
+                boolean override = _override.isSelected();
+                ConfigUtils.setValue("override", override ? "true" : "false");
                 boolean swagger2 = _enableSwagger2.isSelected();
                 ConfigUtils.setValue("enableSwagger2", swagger2 ? "true" : "false");
                 boolean lombok = _enableLombok.isSelected();
@@ -250,19 +264,38 @@ public class ControlPanel extends Panel implements ActionListener {
                     generateModel.setSwagger2(swagger2);
                     generateModel.setTargetDir(targetDir);
                     generateModel.setPackageName(packageName);
+                    generateModel.setOverride(override);
                     executeHandler.execute(generateModel);
                 }
 
             }
         });
 
+
         // 选项
+        int y5 = getBottom(searchField) + 10;
+        _selectAll = new JCheckBox("SelectAll");
+        _selectAll.setBounds(_X, y5, 100, _HEIGHT - 10);
+        _selectAll.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (null != selectAllHandler) {
+                    selectAllHandler.execute(_selectAll.isSelected());
+                }
+            }
+        });
+        this.add(_selectAll);
+
+        _override = new JCheckBox("Override exist");
+        _override.setBounds(getRight(_selectAll) + _X, y5, 120, _HEIGHT - 10);
+        this.add(_override);
+
         _enableSwagger2 = new JCheckBox("Enable Swagger2");
-        _enableSwagger2.setBounds(_X, getBottom(searchField) + 10, 150, _HEIGHT - 10);
+        _enableSwagger2.setBounds(getRight(_override) + _X, y5, 150, _HEIGHT - 10);
         this.add(_enableSwagger2);
 
         _enableLombok = new JCheckBox("Enable Lombok");
-        _enableLombok.setBounds(getRight(_enableSwagger2) + _X, getBottom(searchField) + 10, 150, _HEIGHT - 10);
+        _enableLombok.setBounds(getRight(_enableSwagger2) + _X, y5, 150, _HEIGHT - 10);
         this.add(_enableLombok);
 
         // 初始化数据
@@ -276,6 +309,8 @@ public class ControlPanel extends Panel implements ActionListener {
         _packageField.setText(ConfigUtils.getValue("packageName"));
         targetField.setText(ConfigUtils.getValue("targetDir"));
 
+        _selectAll.setSelected("true".equals(ConfigUtils.getValue("selectAll")));
+        _override.setSelected("true".equals(ConfigUtils.getValue("override")));
         _enableSwagger2.setSelected("true".equals(ConfigUtils.getValue("enableSwagger2")));
         _enableLombok.setSelected("true".equals(ConfigUtils.getValue("enableLombok")));
 
@@ -405,6 +440,14 @@ public class ControlPanel extends Panel implements ActionListener {
 
     public void setExecuteHandler(ControlExecuteHandler executeHandler) {
         this.executeHandler = executeHandler;
+    }
+
+    public SelectAllHandler getSelectAllHandler() {
+        return selectAllHandler;
+    }
+
+    public void setSelectAllHandler(SelectAllHandler selectAllHandler) {
+        this.selectAllHandler = selectAllHandler;
     }
 
     // 自定义

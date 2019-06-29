@@ -72,6 +72,10 @@ public class Generate {
             // TODO 路径
             File file = new File(targetDir + "/" + domainName + ".java");
 
+            if (!gen.getOverride() && file.exists()) {
+                return;
+            }
+
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }

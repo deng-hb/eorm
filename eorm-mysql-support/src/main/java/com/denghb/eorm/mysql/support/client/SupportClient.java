@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Vector;
 
 /**
+ *
+ * TODO 可选覆盖文件？新完善的注解
  * Created by denghb on 2017/2/19.
  */
 public class SupportClient extends JFrame {
@@ -50,8 +52,7 @@ public class SupportClient extends JFrame {
 //        loadPanel.setOpaque(true);
         loadPanel.setBounds(0, 0, this.getWidth(), this.getHeight());
 
-        ClassLoader cldr = this.getClass().getClassLoader();
-        java.net.URL imageURL = cldr.getResource("images/loading.gif");
+        java.net.URL imageURL = getClass().getClassLoader().getResource("images/loading.gif");
         ImageIcon imageIcon = new ImageIcon(imageURL);
         JLabel iconLabel = new JLabel();
         iconLabel.setIcon(imageIcon);
@@ -95,9 +96,20 @@ public class SupportClient extends JFrame {
 
                 data.removeAllElements();
                 for (DatabaseModel model : result) {
-                    if (model.getTableName().indexOf(string) > -1) {
+                    if (model.getTableName().contains(string)) {
                         data.add(model);
                     }
+                }
+
+                table.reloadData();
+            }
+        });
+        controlPanel.setSelectAllHandler(new ControlPanel.SelectAllHandler() {
+            @Override
+            public void execute(boolean select) {
+
+                for (DatabaseModel model : data) {
+                    model.setChecked(select);
                 }
 
                 table.reloadData();

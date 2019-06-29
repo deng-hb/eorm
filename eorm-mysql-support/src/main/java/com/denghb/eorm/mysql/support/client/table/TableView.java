@@ -38,6 +38,7 @@ public class TableView extends JScrollPane {
                     if (rowIndex != -1) {
                         System.out.println("表格行被选中" + rowIndex);
                         Boolean object = (Boolean) tableModel.getValueAt(rowIndex, 2);
+                        tableModel.setValueAt(true, rowIndex, 2);
                         System.out.println(object);
                     }
                 }

@@ -22,7 +22,7 @@ public class ${domainName} implements java.io.Serializable {
 	
 	<#list list as table>
 	<#if swagger2 >@ApiModelProperty(value = "${table.columnComment}")<#else>/** ${table.columnComment} */</#if>
-	@EColumn(name="${table.columnName}"<#if table.columnKey = "PRI">, primaryKey = true</#if>)
+	@EColumn(name="${table.columnName}"<#if table.columnKey = "PRI">, primaryKey = true</#if>, comment="${table.columnComment}")
 	private ${table.dataType} ${table.objectName};
 	
     </#list>
