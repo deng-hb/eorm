@@ -11,7 +11,6 @@ import freemarker.template.Template;
 
 import java.io.*;
 import java.sql.Connection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 public class Generate {
 
-    public static void create(Connection conn, DatabaseModel model, GenerateModel gen) throws GenerateException {
+    public static void create(Connection conn, DatabaseModel model, GenerateModel gen, String generateTime) throws GenerateException {
         if (null == conn) {
             throw new GenerateException("Connection is null");
         }
@@ -64,11 +63,10 @@ public class Generate {
             root.put("databaseName", database);
             root.put("tableDdl", ddl);
 
-            root.put("generateTime", new Date().toString());
+            root.put("generateTime", generateTime);
             root.put("packageName", packageName);
-            root.put("lombok", gen.getLombok());
+            root.put("gen", gen);
 
-            root.put("swagger2", gen.getSwagger2());
             // TODO 路径
             File file = new File(targetDir + "/" + domainName + ".java");
 

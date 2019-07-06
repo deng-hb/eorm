@@ -32,9 +32,14 @@ public class ControlPanel extends Panel implements ActionListener {
     private TextField _packageField;
 
     private JCheckBox _selectAll;
-    private JCheckBox _override;
+
+    private JCheckBox _overrideExist;
     private JCheckBox _enableSwagger2;
     private JCheckBox _enableLombok;
+
+    private JCheckBox _writeDDL;
+    private JCheckBox _writeDatabase;
+    private JCheckBox _writeGenerateTime;
 
     public interface ControlConnectionHandler {
         boolean execute(ConnectionModel model);
@@ -218,6 +223,18 @@ public class ControlPanel extends Panel implements ActionListener {
 
         this.add(searchField);
 
+        _selectAll = new JCheckBox("SelectAll");
+        _selectAll.setBounds(getRight(searchField) + _X, getBottom(searchLabel), 100, _HEIGHT);
+        _selectAll.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (null != selectAllHandler) {
+                    selectAllHandler.execute(_selectAll.isSelected());
+                }
+            }
+        });
+        this.add(_selectAll);
+
 
         TextField executeField = new TextField();
         executeField.setEnabled(false);
@@ -249,12 +266,19 @@ public class ControlPanel extends Panel implements ActionListener {
 
                 boolean selectAll = _selectAll.isSelected();
                 ConfigUtils.setValue("selectAll", selectAll ? "true" : "false");
-                boolean override = _override.isSelected();
-                ConfigUtils.setValue("override", override ? "true" : "false");
+                boolean override = _overrideExist.isSelected();
+                ConfigUtils.setValue("overrideExist", override ? "true" : "false");
                 boolean swagger2 = _enableSwagger2.isSelected();
                 ConfigUtils.setValue("enableSwagger2", swagger2 ? "true" : "false");
                 boolean lombok = _enableLombok.isSelected();
                 ConfigUtils.setValue("enableLombok", lombok ? "true" : "false");
+
+                boolean writeDatabase = _writeDatabase.isSelected();
+                ConfigUtils.setValue("writeDatabase", writeDatabase ? "true" : "false");
+                boolean writeDDL = _writeDDL.isSelected();
+                ConfigUtils.setValue("writeDDL", writeDDL ? "true" : "false");
+                boolean writeGenerateTime = _writeGenerateTime.isSelected();
+                ConfigUtils.setValue("writeGenerateTime", writeGenerateTime ? "true" : "false");
 
 
                 if (null != executeHandler) {
@@ -262,9 +286,14 @@ public class ControlPanel extends Panel implements ActionListener {
                     generateModel.setDatabase(_databaseField.getText());
                     generateModel.setLombok(lombok);
                     generateModel.setSwagger2(swagger2);
+
                     generateModel.setTargetDir(targetDir);
                     generateModel.setPackageName(packageName);
                     generateModel.setOverride(override);
+
+                    generateModel.setWriteDatabase(writeDatabase);
+                    generateModel.setWriteDDL(writeDDL);
+                    generateModel.setWriteGenerateTime(writeGenerateTime);
                     executeHandler.execute(generateModel);
                 }
 
@@ -274,29 +303,32 @@ public class ControlPanel extends Panel implements ActionListener {
 
         // 选项
         int y5 = getBottom(searchField) + 10;
-        _selectAll = new JCheckBox("SelectAll");
-        _selectAll.setBounds(_X, y5, 100, _HEIGHT - 10);
-        _selectAll.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (null != selectAllHandler) {
-                    selectAllHandler.execute(_selectAll.isSelected());
-                }
-            }
-        });
-        this.add(_selectAll);
-
-        _override = new JCheckBox("Override exist");
-        _override.setBounds(getRight(_selectAll) + _X, y5, 120, _HEIGHT - 10);
-        this.add(_override);
+        int _HEIGHT2 = 20;
+        _overrideExist = new JCheckBox("Override Exist");
+        _overrideExist.setBounds(_X, y5, _WIDTH, _HEIGHT2);
+        this.add(_overrideExist);
 
         _enableSwagger2 = new JCheckBox("Enable Swagger2");
-        _enableSwagger2.setBounds(getRight(_override) + _X, y5, 150, _HEIGHT - 10);
+        _enableSwagger2.setBounds(getRight(_overrideExist) + _X, y5, _WIDTH, _HEIGHT2);
         this.add(_enableSwagger2);
 
         _enableLombok = new JCheckBox("Enable Lombok");
-        _enableLombok.setBounds(getRight(_enableSwagger2) + _X, y5, 150, _HEIGHT - 10);
+        _enableLombok.setBounds(getRight(_enableSwagger2) + _X, y5, _WIDTH, _HEIGHT2);
         this.add(_enableLombok);
+
+        // 第二排
+        int y6 = getBottom(_overrideExist) + 10;
+        _writeDatabase = new JCheckBox("Write Database");
+        _writeDatabase.setBounds(_X, y6, _WIDTH, _HEIGHT2);
+        this.add(_writeDatabase);
+
+        _writeDDL = new JCheckBox("Write DDL");
+        _writeDDL.setBounds(getRight(_writeDatabase) + _X, y6, _WIDTH, _HEIGHT2);
+        this.add(_writeDDL);
+
+        _writeGenerateTime = new JCheckBox("Write Generate Time");
+        _writeGenerateTime.setBounds(getRight(_writeDDL) + _X, y6, _WIDTH, _HEIGHT2);
+        this.add(_writeGenerateTime);
 
         // 初始化数据
         _hostField.setText(ConfigUtils.getValue("host"));
@@ -310,9 +342,13 @@ public class ControlPanel extends Panel implements ActionListener {
         targetField.setText(ConfigUtils.getValue("targetDir"));
 
         _selectAll.setSelected("true".equals(ConfigUtils.getValue("selectAll")));
-        _override.setSelected("true".equals(ConfigUtils.getValue("override")));
+        _overrideExist.setSelected("true".equals(ConfigUtils.getValue("overrideExist")));
         _enableSwagger2.setSelected("true".equals(ConfigUtils.getValue("enableSwagger2")));
         _enableLombok.setSelected("true".equals(ConfigUtils.getValue("enableLombok")));
+
+        _writeDatabase.setSelected("true".equals(ConfigUtils.getValue("writeDatabase")));
+        _writeDDL.setSelected("true".equals(ConfigUtils.getValue("writeDDL")));
+        _writeGenerateTime.setSelected("true".equals(ConfigUtils.getValue("writeGenerateTime")));
 
     }
 

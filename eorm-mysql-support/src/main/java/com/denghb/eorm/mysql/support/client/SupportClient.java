@@ -13,12 +13,13 @@ import com.denghb.eorm.mysql.support.generate.utils.DbUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 /**
- *
  * TODO 可选覆盖文件？新完善的注解
  * Created by denghb on 2017/2/19.
  */
@@ -36,12 +37,12 @@ public class SupportClient extends JFrame {
     public SupportClient() {
         this.setTitle("Generate Entity from MySQL!!!");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 关闭按钮的动作为退出窗口
-        this.setSize(800, 600);// 大小
+        this.setSize(800, 640);// 大小
         this.setResizable(false);// 禁止缩放
         this.setLocationRelativeTo(null);// 屏幕居中显示，需要先设置frame大小
 
         panel.setLayout(null);
-        panel.setBounds(0, 0, 800, 600);
+        panel.setBounds(0, 0, 800, 640);
         this.add(panel);
 
 
@@ -64,7 +65,7 @@ public class SupportClient extends JFrame {
 
         // 操作面板
         ControlPanel controlPanel = new ControlPanel();
-        controlPanel.setBounds(0, 0, this.getWidth(), 280);
+        controlPanel.setBounds(0, 0, this.getWidth(), 300);
         controlPanel.setConnectionHandler(new ControlPanel.ControlConnectionHandler() {
             @Override
             public boolean execute(ConnectionModel model) {
@@ -130,11 +131,12 @@ public class SupportClient extends JFrame {
                     @Override
                     protected Object doInBackground() throws Exception {
 
+                        String generateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
                         for (DatabaseModel model : data) {
 
                             try {
                                 if (model.isChecked()) {
-                                    Generate.create(DbUtils.getConnection(), model, generateModel);
+                                    Generate.create(DbUtils.getConnection(), model, generateModel, generateTime);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -155,7 +157,7 @@ public class SupportClient extends JFrame {
         });
         panel.add(controlPanel);
         // 表格
-        table.setBounds(30, 280, 740, 280);
+        table.setBounds(30, 300, 740, 280);
         panel.add(table);
 
         this.setVisible(true);// 显示

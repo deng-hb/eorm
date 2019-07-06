@@ -1,32 +1,32 @@
 package ${packageName};
 
-import com.denghb.eorm.annotation.EColumn;
-import com.denghb.eorm.annotation.ETable;
-<#if swagger2 >import io.swagger.annotations.ApiModelProperty;</#if>
+import com.denghb.eorm.annotation.Ecolumn;
+import com.denghb.eorm.annotation.Etable;
+<#if gen.swagger2 >import io.swagger.annotations.ApiModelProperty;</#if>
 
 /**
  * ${tableComment}
- * DDL
+<#if gen.writeDDL > * DDL
  * 
  <pre>
 ${tableDdl}
- <pre>
+ <pre> <#else> *</#if>
  * @author denghb
- * @generateTime ${generateTime}
- */
-<#if lombok >@lombok.Data()
-@ETable(name="${tableName}", database="${databaseName}")<#else>@ETable(name="${tableName}", database="${databaseName}")</#if>
+<#if gen.writeGenerateTime > * @generateTime ${generateTime}
+</#if> */
+<#if gen.lombok >@lombok.Data()
+@Etable(name = "${tableName}"<#if gen.writeDatabase >, database="${databaseName}"</#if>)<#else>@Etable(name="${tableName}"<#if gen.writeDatabase >, database="${databaseName}"</#if>)</#if>
 public class ${domainName} implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	<#list list as table>
-	<#if swagger2 >@ApiModelProperty(value = "${table.columnComment}")<#else>/** ${table.columnComment} */</#if>
-	@EColumn(name="${table.columnName}"<#if table.columnKey = "PRI">, primaryKey = true</#if>, comment="${table.columnComment}")
+	<#if gen.swagger2 >@ApiModelProperty(value = "${table.columnComment}")<#else>/** ${table.columnComment} */</#if>
+	@Ecolumn(name = "${table.columnName}"<#if table.columnKey = "PRI">, primaryKey = true</#if>)
 	private ${table.dataType} ${table.objectName};
 	
     </#list>
-    <#if !lombok><#list list as table>
+    <#if !gen.lombok><#list list as table>
 	public ${table.dataType} get${table.methodName}() {
 		return ${table.objectName};
 	}
@@ -38,7 +38,7 @@ public class ${domainName} implements java.io.Serializable {
 	</#list>
 	@Override
 	public String toString() {
-		StringBuilder str = new StringBuilder("{");
+		StringBuilder str = new StringBuilder("${domainName} {");
 		<#list list as table>
 		str.append("\"${table.objectName}\":\"");
 		str.append(${table.objectName});
