@@ -50,6 +50,7 @@ public class JdbcUtils {
             }
         }
     }
+
     /**
      * 关闭
      */
@@ -79,7 +80,7 @@ public class JdbcUtils {
     /**
      * 驼峰格式转换为下划线格式
      */
-    public String humpToUnderline(String name) {
+    public static String humpToUnderline(String name) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < name.length(); i++) {
             char ch = name.charAt(i);
@@ -100,7 +101,7 @@ public class JdbcUtils {
     /**
      * 下划线格式转换为驼峰格式
      */
-    public String underlineToHump(String name, boolean firstCharToUpper) {
+    public static String underlineToHump(String name, boolean firstCharToUpper) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < name.length(); i++) {
             char ch = name.charAt(i);
@@ -119,5 +120,22 @@ public class JdbcUtils {
         return builder.toString();
     }
 
+    /**
+     * 获取数据库名
+     *
+     * @param jdbc
+     * @return
+     */
+    public static String getDatabase(String jdbc) {
+        if (null == jdbc) {
+            return null;
+        }
+        int start = jdbc.lastIndexOf("/");
+        int end = jdbc.indexOf("?");
+        if (-1 == start || -1 == end) {
+            return null;
+        }
+        return jdbc.substring(start + 1, end);
+    }
 
 }
